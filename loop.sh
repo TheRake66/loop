@@ -29,26 +29,26 @@
 # @param
 # @return
 function showUsage() {
-	echo "Description:"
-	echo "    Run a bash script and automatically restarts it in case of a scheduled"
-	echo "    shutdown or crash."
-	echo
-	echo "Usage:"
-	echo "    loop [mode] [time] [script] <arguments>"
-	echo
-	echo "Options:"
-	echo "    [mode]"
-	echo "        -start     Start the script and watch it."
-	echo "        -stop      Stop watching the script but don't stop it."
-	echo "    [time]         The timeout before restarting the script (in seconds)."
-	echo "    [script]       The script path."
-	echo "    <arguments>    The argument(s) to pass to the script when starting."
-	echo
-	echo "Example:"
-	echo "    loop -start 5 ./script.sh"
-	echo "    loop -start 0 ./script.sh arg1 arg2"
-	echo "    loop -stop ./script.sh"
-	echo
+    echo "Description:"
+    echo "    Run a bash script and automatically restarts it in case of a scheduled"
+    echo "    shutdown or crash."
+    echo
+    echo "Usage:"
+    echo "    loop [mode] [time] [script] <arguments>"
+    echo
+    echo "Options:"
+    echo "    [mode]"
+    echo "        -start     Start the script and watch it."
+    echo "        -stop      Stop watching the script but don't stop it."
+    echo "    [time]         The timeout before restarting the script (in seconds)."
+    echo "    [script]       The script path."
+    echo "    <arguments>    The argument(s) to pass to the script when starting."
+    echo
+    echo "Example:"
+    echo "    loop -start 5 ./script.sh"
+    echo "    loop -start 0 ./script.sh arg1 arg2"
+    echo "    loop -stop ./script.sh"
+    echo
     exit 0
 }
 
@@ -59,7 +59,7 @@ function showUsage() {
 # @param $1 [string] Le message à afficher.
 # @return
 function throwError() {
-	echo "Error: $1"
+    echo "Error: $1"
     exit 1
 }
 
@@ -70,10 +70,10 @@ function throwError() {
 # @param $1 [string] Le chemin du script.
 # @return
 function scriptExist() {
-	script=$1
-	if [[ ! -f $script || ! $script == *.sh ]]; then
-		throwError "File not found or is'nt a bash script."
-	fi
+    script=$1
+    if [[ ! -f $script || ! $script == *.sh ]]; then
+        throwError "File not found or is'nt a bash script."
+    fi
 }
 
 
@@ -83,10 +83,10 @@ function scriptExist() {
 # @param $1 [int] Le temps en secondes.
 # @return
 function timeNumber() {
-	time=$1
-	if [[ ! $time =~ ^[0-9]+$ || $time -le 0 ]]; then
-		throwError "Time must be a positive integer."
-	fi
+    time=$1
+    if [[ ! $time =~ ^[0-9]+$ || $time -le 0 ]]; then
+        throwError "Time must be a positive integer."
+    fi
 }
 
 
@@ -98,22 +98,22 @@ function timeNumber() {
 # @param $... [any] Liste des paramètres à passer au script.
 # @return
 function startLoop() {
-	time=$1
-	script=$2
-	arguments=${@:3}
-	workdir=$(dirname "$script")
-	locker="$script.loop"
-	count=0
-	touch "$locker"
-	cd "$workdir"
-	(bash "$script" "$arguments")
-	while [[ -f $locker ]]; do
-    	echo "Waiting $time second(s)..."
-    	sleep "$time"
-    	((count++))
-    	echo "Restarting for the $count time."
-		(bash "$script" "$arguments")
-	done
+    time=$1
+    script=$2
+    arguments=${@:3}
+    workdir=$(dirname "$script")
+    locker="$script.loop"
+    count=0
+    touch "$locker"
+    cd "$workdir"
+    (bash "$script" "$arguments")
+    while [[ -f $locker ]]; do
+        echo "Waiting $time second(s)..."
+        sleep "$time"
+        ((count++))
+        echo "Restarting for the $count time."
+        (bash "$script" "$arguments")
+    done
 }
 
 
@@ -123,30 +123,30 @@ function startLoop() {
 # @param $1 [string] Chemin du script à lancer.
 # @return
 function stopLoop() {
-	script=$1
-	locker="$script.loop"
-	rm -f "$locker"
+    script=$1
+    locker="$script.loop"
+    rm -f "$locker"
 }
 
 
 
 if [[ $# -eq 0 ]]; then
-	showUsage
+    showUsage
 elif [[ $1 = "-start" ]]; then
-	if [[ $# -lt 3 ]]; then
-		throwError "Missing time or script file."
-	else
-		timeNumber "$2"
-		scriptExist "$3"
-		startLoop "$2" "$3" "${@:4}"
-	fi
+    if [[ $# -lt 3 ]]; then
+        throwError "Missing time or script file."
+    else
+        timeNumber "$2"
+        scriptExist "$3"
+        startLoop "$2" "$3" "${@:4}"
+    fi
 elif [[ $1 = "-stop" ]]; then
-	if [[ $# -lt 2 ]]; then
-		throwError "Missing script file."
-	else
-		scriptExist "$2"
-		stopLoop "$2"
-	fi
+    if [[ $# -lt 2 ]]; then
+        throwError "Missing script file."
+    else
+        scriptExist "$2"
+        stopLoop "$2"
+    fi
 else
-	throwError "Unknown mode selected."
+    throwError "Unknown mode selected."
 fi

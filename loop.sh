@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.0.5.0                                     #
+#              Version: 1.1.5.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -131,15 +131,17 @@ function startLoop() {
     local locker="$_script.loop"
     if [[ ! -f $locker ]]; then
         touch "$locker"
+        echo "Loop start, first run."
         runInstance "$_script" "$_arguments"
-        local count=0
+        local count=1
         while [[ -f $locker ]]; do
             echo "Waiting $_time second(s)..."
             sleep "$_time"
-            ((count++))
             echo "Re-run for the $count time."
+            ((count++))
             runInstance "$_script" "$_arguments"
         done
+        echo "End of loop, $count run(s) in total."
     else
         throwError "Script already looping."
     fi

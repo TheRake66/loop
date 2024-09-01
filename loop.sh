@@ -108,10 +108,10 @@ function startLoop() {
 	cd "$workdir"
 	(bash "$script" "$arguments")
 	while [[ -f $locker ]]; do
-    	echo "Waiting $time..."
+    	echo "Waiting $time second(s)..."
     	sleep "$time"
     	((count++))
-    	echo "Auto-start $count."
+    	echo "Restarting for the $count time."
 		(bash "$script" "$arguments")
 	done
 }
@@ -134,7 +134,7 @@ if [[ $# -eq 0 ]]; then
 	showUsage
 elif [[ $1 = "-start" ]]; then
 	if [[ $# -lt 3 ]]; then
-		showUsage
+		throwError "Missing time or script file."
 	else
 		timeNumber "$2"
 		scriptExist "$3"
@@ -142,11 +142,11 @@ elif [[ $1 = "-start" ]]; then
 	fi
 elif [[ $1 = "-stop" ]]; then
 	if [[ $# -lt 2 ]]; then
-		showUsage
+		throwError "Missing script file."
 	else
 		scriptExist "$2"
 		stopLoop "$2"
 	fi
 else
-	throwError "Unknown mode."
+	throwError "Unknown mode selected."
 fi

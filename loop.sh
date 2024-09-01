@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.0.1.0                                     #
+#              Version: 1.0.2.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -30,12 +30,12 @@
 # @return
 function showUsage() {
 	echo "Description:"
-	echo "    Run a bash script and automatically restarts it in case of a"
-	echo "    scheduled shutdown or crash."
-	echo ""
+	echo "    Run a bash script and automatically restarts it in case of a scheduled"
+	echo "    shutdown or crash."
+	echo
 	echo "Usage:"
 	echo "    loop [mode] [time] [script] <arguments>"
-	echo ""
+	echo
 	echo "Options:"
 	echo "    [mode]"
 	echo "        -start     Start the script and watch it."
@@ -43,7 +43,7 @@ function showUsage() {
 	echo "    [time]         The timeout before restarting the script (in seconds)."
 	echo "    [script]       The script path."
 	echo "    <arguments>    The argument(s) to pass to the script when starting."
-	echo ""
+	echo
 	echo "Example:"
 	echo "    loop -start 5 ./script.sh"
 	echo "    loop -start 0 ./script.sh arg1 arg2"

@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.0.4.0                                     #
+#              Version: 1.0.5.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -31,7 +31,7 @@
 # @return
 function showUsage() {
     echo "Description:"
-    echo "    Run a bash script and automatically restarts it in case of a scheduled"
+    echo "    Run a bash script and automatically re-run it in case of a scheduled"
     echo "    shutdown or crash."
     echo
     echo "Usage:"
@@ -39,11 +39,11 @@ function showUsage() {
     echo
     echo "Options:"
     echo "    [mode]"
-    echo "        -start     Start the script and watch it."
-    echo "        -stop      Stop watching the script but don't stop it."
-    echo "    [time]         The timeout before restarting the script (in seconds)."
-    echo "    [script]       The script path."
-    echo "    <arguments>    The argument(s) to pass to the script when starting."
+    echo "        -start     Run the script and loop it."
+    echo "        -stop      Stop looping the script but don't stop it."
+    echo "    [time]         Timeout before re-run the script (in seconds)."
+    echo "    [script]       Script file path."
+    echo "    <arguments>    Argument(s) to pass to the script when running."
     echo
     echo "Example:"
     echo "    loop -start 5 ./script.sh"
@@ -61,7 +61,8 @@ function showUsage() {
 # @throws
 # @return
 function throwError() {
-    echo "Error: $1"
+    local _message=$1
+    echo "Error: $_message"
     exit 1
 }
 
@@ -74,10 +75,10 @@ function throwError() {
 # @throws Si le fichier n'est pas un script.
 # @return
 function scriptExist() {
-    script=$1
-    if [[ ! -f $script ]]; then
+    local _script=$1
+    if [[ ! -f $_script ]]; then
         throwError "File not found."
-    elif [[ ! $script == *.sh ]]; then
+    elif [[ ! $_script == *.sh ]]; then
         throwError "File is'nt a bash script."
     fi
 }
@@ -91,12 +92,27 @@ function scriptExist() {
 # @throws Si le temps n'est pas positif.
 # @return
 function timeNumber() {
-    time=$1
-    if ! [[ $time =~ ^[0-9]+$ ]]; then
+    local _time=$1
+    if [[ ! $_time =~ ^[0-9]+$ ]]; then
         throwError "Time must be a positive integer."
-    elif [[ $time -le 0 ]]; then
+    elif [[ $_time -le 0 ]]; then
         throwError "Time must be greater than 0."
     fi
+}
+
+
+
+# Exécute un script dans une autre instance avec comme répertoire de travail le répertoire du script.
+#
+# @param $1 [string] Chemin du script à lancer.
+# @param $... [any] Liste des paramètres à passer au script.
+# @throws
+# @return
+function runInstance() {
+    local _script=$1
+    local _arguments=${@:2}
+    local workdir=$(dirname "$_script")
+    (cd "$workdir"; bash "$_script" "$_arguments")
 }
 
 
@@ -109,22 +125,24 @@ function timeNumber() {
 # @throws
 # @return
 function startLoop() {
-    time=$1
-    script=$2
-    arguments=${@:3}
-    workdir=$(dirname "$script")
-    locker="$script.loop"
-    count=0
-    touch "$locker"
-    cd "$workdir"
-    (bash "$script" "$arguments")
-    while [[ -f $locker ]]; do
-        echo "Waiting $time second(s)..."
-        sleep "$time"
-        ((count++))
-        echo "Restarting for the $count time."
-        (bash "$script" "$arguments")
-    done
+    local _time=$1
+    local _script=$2
+    local _arguments=${@:3}
+    local locker="$_script.loop"
+    if [[ ! -f $locker ]]; then
+        touch "$locker"
+        runInstance "$_script" "$_arguments"
+        local count=0
+        while [[ -f $locker ]]; do
+            echo "Waiting $_time second(s)..."
+            sleep "$_time"
+            ((count++))
+            echo "Re-run for the $count time."
+            runInstance "$_script" "$_arguments"
+        done
+    else
+        throwError "Script already looping."
+    fi
 }
 
 
@@ -135,29 +153,37 @@ function startLoop() {
 # @throws
 # @return
 function stopLoop() {
-    script=$1
-    locker="$script.loop"
-    rm -f "$locker"
+    local _script=$1
+    local locker="$_script.loop"
+    if [[ -f $locker ]]; then
+        rm -f "$locker"
+        echo "Loop was stopped but not the script."
+    else
+        throwError "Script not looping."
+    fi
 }
 
 
 
+# main
 if [[ $# -eq 0 ]]; then
     showUsage
 elif [[ $1 = "-start" ]]; then
-    if [[ $# -lt 3 ]]; then
-        throwError "Missing time or script file."
-    else
+    if [[ $# -ge 3 ]]; then
         timeNumber "$2"
         scriptExist "$3"
         startLoop "$2" "$3" "${@:4}"
+    else
+        throwError "Missing time or script file."
     fi
 elif [[ $1 = "-stop" ]]; then
-    if [[ $# -lt 2 ]]; then
-        throwError "Missing script file."
-    else
+    if [[ $# -eq 2 ]]; then
         scriptExist "$2"
         stopLoop "$2"
+    elif [[ $# -gt 2 ]]; then
+        throwError "Too much arguments."
+    else
+        throwError "Missing script file."
     fi
 else
     throwError "Unknown mode selected."

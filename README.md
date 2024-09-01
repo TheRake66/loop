@@ -5,7 +5,7 @@
 ## Usage
 ```
 Description:
-    Run a bash script and automatically restarts it in case of a scheduled
+    Run a bash script and automatically re-run it in case of a scheduled
     shutdown or crash.
 
 Usage:
@@ -13,11 +13,11 @@ Usage:
 
 Options:
     [mode]
-        -start     Start the script and watch it.
-        -stop      Stop watching the script but don't stop it.
-    [time]         The timeout before restarting the script (in seconds).
-    [script]       The script path.
-    <arguments>    The argument(s) to pass to the script when starting.
+        -start     Run the script and loop it.
+        -stop      Stop looping the script but don't stop it.
+    [time]         Timeout before re-run the script (in seconds).
+    [script]       Script file path.
+    <arguments>    Argument(s) to pass to the script when running.
 
 Example:
     loop -start 5 ./script.sh

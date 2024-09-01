@@ -170,7 +170,7 @@ function stopLoop() {
 # main
 if [[ $# -eq 0 ]]; then
     showUsage
-elif [[ $1 = "-start" ]]; then
+elif [[ $1 -eq "-start" ]]; then
     if [[ $# -ge 3 ]]; then
         timeNumber "$2"
         scriptExist "$3"
@@ -178,7 +178,7 @@ elif [[ $1 = "-start" ]]; then
     else
         throwError "Missing time or script file."
     fi
-elif [[ $1 = "-stop" ]]; then
+elif [[ $1 -eq "-stop" ]]; then
     if [[ $# -eq 2 ]]; then
         scriptExist "$2"
         stopLoop "$2"

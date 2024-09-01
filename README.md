@@ -21,7 +21,7 @@ Options:
 
 Example:
     loop -start 5 ./script.sh
-    loop -start 0 ./script.sh arg1 arg2
+    loop -start 1 ./script.sh arg1 arg2
     loop -stop ./script.sh
 ```
 

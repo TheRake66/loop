@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.0.3.0                                     #
+#              Version: 1.0.4.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -27,6 +27,7 @@
 # Affiche la documentation d'aide.
 #
 # @param
+# @throws
 # @return
 function showUsage() {
     echo "Description:"
@@ -46,7 +47,7 @@ function showUsage() {
     echo
     echo "Example:"
     echo "    loop -start 5 ./script.sh"
-    echo "    loop -start 0 ./script.sh arg1 arg2"
+    echo "    loop -start 1 ./script.sh arg1 arg2"
     echo "    loop -stop ./script.sh"
     echo
     exit 0
@@ -54,9 +55,10 @@ function showUsage() {
 
 
 
-# Affiche une erreur et quitte le script avec un code erreur 1.
+# Affiche une erreur et quitte le script avec un code de retour 1.
 #
 # @param $1 [string] Le message à afficher.
+# @throws
 # @return
 function throwError() {
     echo "Error: $1"
@@ -65,14 +67,18 @@ function throwError() {
 
 
 
-# Déclenche une erreur si le script n'existe pas.
+# Déclenche une erreur si le fichier n'existe pas ou n'est pas un script.
 #
 # @param $1 [string] Le chemin du script.
+# @throws Si le fichier n'existe pas.
+# @throws Si le fichier n'est pas un script.
 # @return
 function scriptExist() {
     script=$1
-    if [[ ! -f $script || ! $script == *.sh ]]; then
-        throwError "File not found or is'nt a bash script."
+    if [[ ! -f $script ]]; then
+        throwError "File not found."
+    elif [[ ! $script == *.sh ]]; then
+        throwError "File is'nt a bash script."
     fi
 }
 
@@ -81,11 +87,15 @@ function scriptExist() {
 # Déclenche une erreur si le temps n'est pas un entier positif.
 #
 # @param $1 [int] Le temps en secondes.
+# @throws Si le temps n'est pas un nombre entier.
+# @throws Si le temps n'est pas positif.
 # @return
 function timeNumber() {
     time=$1
-    if [[ ! $time =~ ^[0-9]+$ || $time -le 0 ]]; then
+    if ! [[ $time =~ ^[0-9]+$ ]]; then
         throwError "Time must be a positive integer."
+    elif [[ $time -le 0 ]]; then
+        throwError "Time must be greater than 0."
     fi
 }
 
@@ -96,6 +106,7 @@ function timeNumber() {
 # @param $1 [int] Nombre de secondes avant de relancer le script.
 # @param $2 [string] Chemin du script à lancer.
 # @param $... [any] Liste des paramètres à passer au script.
+# @throws
 # @return
 function startLoop() {
     time=$1
@@ -121,6 +132,7 @@ function startLoop() {
 # Arrête la surveillance mais pas le script.
 #
 # @param $1 [string] Chemin du script à lancer.
+# @throws
 # @return
 function stopLoop() {
     script=$1

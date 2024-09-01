@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.0.0.0                                     #
+#              Version: 1.0.1.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #

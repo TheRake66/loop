@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.1.6.0                                     #
+#              Version: 1.1.7.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -135,8 +135,8 @@ function startLoop() {
         while [[ -f $locker ]]; do
             echo "Waiting $_time second(s)..."
             sleep "$_time"
-            echo "Re-run for the $count time."
             ((count++))
+            echo "Re-run for the $count time."
             runInstance "$_script" "$_arguments"
         done
         echo "End of loop, $count run(s) in total."

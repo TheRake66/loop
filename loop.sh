@@ -16,7 +16,7 @@
 #                       (thibault.bustos1234@gmail.com)             #
 #     Date de création: 01/09/2024                                  #
 # Date de modification: 01/09/2024                                  #
-#              Version: 1.1.5.0                                     #
+#              Version: 1.1.6.0                                     #
 #          Dépendances: Aucune                                      #
 #              Licence: MIT License                                 #
 #                                                                   #
@@ -49,8 +49,6 @@ function showUsage() {
     echo "    loop -start 5 ./script.sh"
     echo "    loop -start 1 ./script.sh arg1 arg2"
     echo "    loop -stop ./script.sh"
-    echo
-    exit 0
 }
 
 
@@ -170,7 +168,7 @@ function stopLoop() {
 # main
 if [[ $# -eq 0 ]]; then
     showUsage
-elif [[ $1 -eq "-start" ]]; then
+elif [[ $1 == "-start" ]]; then
     if [[ $# -ge 3 ]]; then
         timeNumber "$2"
         scriptExist "$3"
@@ -178,7 +176,7 @@ elif [[ $1 -eq "-start" ]]; then
     else
         throwError "Missing time or script file."
     fi
-elif [[ $1 -eq "-stop" ]]; then
+elif [[ $1 == "-stop" ]]; then
     if [[ $# -eq 2 ]]; then
         scriptExist "$2"
         stopLoop "$2"
